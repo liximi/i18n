@@ -1,7 +1,22 @@
 local i18n = {}
 i18n.__index = i18n
-i18n.__call  = function(self, key)
-	return self:get(key)
+i18n.__call = function(self, key)
+    return self:get(key)
+end
+
+local love_version_major, love_version_minor, love_version_revision = love._version_major, love._version_minor,
+    love._version_revision
+local function IsFile(file)
+    if love_version_major >= 11 then
+        local info = love.filesystem.getInfo(file)
+        if not info or info.type ~= "file" then
+            return false
+        end
+    else
+        if not love.filesystem.isFile(file) then
+            return false
+        end
+    end
 end
 
 local d = console and console.d or print
@@ -25,9 +40,9 @@ local function new()
 end
 
 function i18n:load(file)
-	if not love.filesystem.isFile(file) then
-		return false
-	end
+    if not IsFile(file) then
+        return false
+    end
 	local locale
 	local bork = function(msg)
 		e(string.format("Error loading locale %s: %s", file, tostring(msg)))
